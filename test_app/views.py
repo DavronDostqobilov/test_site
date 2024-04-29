@@ -7,6 +7,14 @@ from rest_framework.request import Request
 from .models import Test,User
 from .serializers import TestSerializer, UserSerializer, ResultSerializer
 
+class UserRegistrationView(APIView):
+    def post(self, request:Request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class TestView(APIView):
     def get(self, request: Request, pk=None,q_type=None,q_subject=None) -> Response:
         if pk is None and q_subject is None and q_type is None:

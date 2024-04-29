@@ -1,14 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
-class User(models.Model):
-    first_name=models.CharField(max_length=30)
-    last_name=models.CharField(max_length=30)
-    login=models.CharField(max_length=15)
-    password=models.CharField(max_length=15)
-    class_lebal=models.IntegerField()
-    def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}"
+
 class Test(models.Model):
     
     MY_CHOICES = [
