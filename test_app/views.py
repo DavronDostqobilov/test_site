@@ -10,14 +10,14 @@ from .models import Test,User
 from .serializers import TestSerializer, UserSerializer, ResultSerializer
 
 class UserRegistrationView(APIView):
+    # register user
     def post(self, request:Request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(f"Welcom to our site!!! You have successfully registered!!!", status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    permission_classes = [IsAuthenticated]
+    # get user 
     def get(self, request:Request, pk:int=None):
         if pk!=None:
             try:
@@ -59,6 +59,25 @@ class TestView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Test.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    # post method 
+    def post(self, request:Request):
+        data = request.data
+        serializer = TestSerializer(data=data)
+        question = data["question_str"]
+        print(request.user)
+        find = Test.objects.filter(question_str = question )
+        print(len(find))
+        
+        if serializer.is_valid():
+            if find==0 and request.user == 'admin':
+                serializer.save()
+                return Response("Congrulations this test add baza!!!",status=status.HTTP_201_CREATED)
+            elif find != 0 and  request.user =='admin':
+                return Response("this test already exist", status=status.HTTP_208_ALREADY_REPORTED)
+            elif request.user !='admin':
+                return Response("You cannot create a test!!!", status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # result class 
