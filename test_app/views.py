@@ -6,8 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
 
 
-from .models import Test,User
+from .models import Test,User, Result
 from .serializers import TestSerializer, UserSerializer, ResultSerializer
+from unittest import result
 
 
 class UserRegistrationView(APIView):
@@ -69,6 +70,25 @@ class ResultView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [BasicAuthentication]
     # get method
+    def get(self, request:Request, pk = None):
+        if pk==None:
+            restult = Result.objects.all()
+            serializer = ResultSerializer(restult, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            try:
+                result = Result.objects.get(pk=pk)
+                serializer = ResultSerializer(result)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Result.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+    def post(self, request:Request):
+        serializer = ResultSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
 
 
