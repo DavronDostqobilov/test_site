@@ -20,18 +20,16 @@ class UserRegistrationView(APIView):
             return Response(f"Welcom to our site!!! You have successfully registered!!!", status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # get user 
-    def get(self, request:Request, pk:int=None):
-        if pk!=None:
-            try:
-                user = User.objects.get(pk=pk)
-                serializer = UserSerializer(user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                return Response("this user does not exist",status=status.HTTP_404_NOT_FOUND)
-        else:
-            users = User.objects.all()
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request:Request):
+        username = request.user
+        data = User.objects.get(username=username)
+        return Response({
+            'username': data.username,
+            "first_name": data.first_name,
+            "last_name": data.last_name,
+            "email": data.email
+            }, status=status.HTTP_202_ACCEPTED)
+        
     
 class TestView(APIView):
     permission_classes = [IsAuthenticated]
@@ -77,7 +75,7 @@ class ResultView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             try:
-                result = Result.objects.get(pk=pk)
+                result = Result.objects.get(pk = pk)
                 serializer = ResultSerializer(result)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Result.DoesNotExist:

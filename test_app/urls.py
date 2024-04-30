@@ -4,7 +4,6 @@ from .views import TestView,UserRegistrationView, ResultView
 
 urlpatterns = [
     path('register/' , UserRegistrationView.as_view()),
-    path('register/<int:pk>/', UserRegistrationView.as_view()),
     path('test/', TestView.as_view()),
     path('test/<int:pk>/', TestView.as_view()),
     path('test/<str:q_type>/', TestView.as_view()),
