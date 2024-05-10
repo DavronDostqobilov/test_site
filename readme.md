@@ -53,6 +53,7 @@ Users endpoints:
 | ------ | -------- | ----------- |
 | POST   | /register   | Create a user |
 | GET | /register | get a user |
+|POST | /auth  | user login |
 
 Tests endpoints:
 
