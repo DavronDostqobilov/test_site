@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+import base64
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import BasicAuthentication
-
+from django.contrib.auth.models import User
 from django.contrib.auth import hashers
 
-from .models import Test,User, Result
+from .models import Test,Result
 from .serializers import TestSerializer, UserSerializer, ResultSerializer
 from unittest import result
 
@@ -15,15 +16,23 @@ from unittest import result
 # login class :
 class LoginView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request:Request)->Response:
-        username = request.data.get("username")
-        password = request.data.get("password")
-        user = User.objects.get(username=username)
-        if not user:
-            return Response("You are not registered in the system or you entered the wrong username!!!", status=status.HTTP_401_UNAUTHORIZED) 
-        else:               
-            return Response('You are successfully logged in!!!', status=status.HTTP_202_ACCEPTED)
+        # "Authorization": "Basic <base64.encode(username)>:<base64.encode(64)>
+        r=request.headers.get("Authorization")
+        s=r.split(' ')[1]
+        s1=str(base64.b64decode(s))
+        username=s1.split(':')[0][2:]
+        password=s1.split(':')[1][:-1]
+        user=User.objects.filter(username=username)
+
+        if user:
+            user = user.first()
+            if user.check_password(password):
+                return Response('You are successfully logged in!!!', status=status.HTTP_202_ACCEPTED) 
+        else:
+            return Response("You are not registered in the system or you entered the wrong username!!!", status=status.HTTP_401_UNAUTHORIZED)
+
         
 
 class UserRegistrationView(APIView):
